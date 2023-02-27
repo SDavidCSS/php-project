@@ -65,7 +65,6 @@
                         src="./images/telekom.png"
                         height="30"
                         alt="Slovak Telekom"
-                        loading="lazy"
                 />
             </a>
             <div class="container-fluid">
@@ -117,20 +116,21 @@
                             <td><?= $offer->comment ?></td>
                             <td><?= $offer->discount_percent ?> %</td>
                             <td>
-                                <?php foreach($offer->offerProducts as $product): ?>
-                                    <?php if(isset($product['name'])): ?>
+                                <?php /** @var OfferProduct $offerProduct */
+                                foreach($offer->offerProducts as $offerProduct): ?>
+                                    <?php if(isset($offerProduct->product->image)): ?>
                                         <div class="row mb-1">
                                             <div class="col-3">
-                                                <img src=".<?= $product['image'] ?>" alt="<?= $product['name'] ?>" style="width: 50px">
+                                                <img src=".<?= $offerProduct->product->image ?>" alt="<?= $offerProduct->product->name ?>" style="width: 50px">
                                             </div>
                                             <div class="col-3">
-                                                <p><?= $product['name'] ?></p>
+                                                <p><?= $offerProduct->product->name ?></p>
                                             </div>
                                             <div class="col-3">
-                                                <p><?= $product['price'] ?> €</p>
+                                                <p><?= $offerProduct->product->price ?> €</p>
                                             </div>
                                             <div class="col-3">
-                                                <p><?= $product['amount'] ?> ks</p>
+                                                <p><?= $offerProduct->amount ?> ks</p>
                                             </div>
                                         </div>
                                     <?php endif; ?>

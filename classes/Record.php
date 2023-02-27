@@ -18,13 +18,33 @@ abstract class Record implements RecordInterface
 
     public static function findOne($conditions)
     {
-        $tableName = static::tableName();
+        $stmt = static::find($conditions);
+        return $stmt->fetchObject(static::class);
+    }
 
-        if(!is_array($conditions)) {
+    public static function findAll($conditions = null)
+    {
+        $results = static::find($conditions);
+        $results = $results->fetchAll();
+
+        $data = [];
+        foreach ($results as $result) {
+            $record = new static;
+            $record->load($result);
+            $data[] = $record;
+        }
+
+        return $data;
+    }
+
+    private static function find($conditions)
+    {
+        $tableName = static::tableName();
+        if(!is_array($conditions) && $conditions !== null) {
             $sql = "SELECT * FROM $tableName WHERE id=:id";
             $stmt = Database::getInstance()->prepare($sql);
             $stmt->bindValue(':id', $conditions);
-        } else {
+        } elseif ($conditions !== null) {
             $keys = array_keys($conditions);
             $condition = implode(' AND ', array_map(fn($item) => "$item=:$item", $keys));
             $sql = "SELECT * FROM $tableName WHERE $condition";
@@ -33,10 +53,14 @@ abstract class Record implements RecordInterface
             foreach ($conditions as $key => $value) {
                 $stmt->bindValue(":$key", $value);
             }
-
+        } else {
+            $sql = "SELECT * FROM $tableName";
+            $stmt = Database::getInstance()->query($sql);
         }
+
         $stmt->execute();
-        return $stmt->fetchObject(static::class);
+
+        return $stmt;
     }
 
     public function save():bool
@@ -98,6 +122,16 @@ abstract class Record implements RecordInterface
         $stmt->bindValue(":$primaryKey", $this->$primaryKey);
 
         return $stmt->execute();
+    }
+
+    public function delete()
+    {
+        $tableName = static::tableName();
+        $primaryKey = static::primaryKey();
+
+        $sql = "DELETE FROM $tableName WHERE $primaryKey=:$primaryKey";
+        $stmt = Database::getInstance()->prepare($sql);
+        $stmt->execute([":$primaryKey" => $this->$primaryKey]);
     }
 
     protected function getIsNewRecord(): bool

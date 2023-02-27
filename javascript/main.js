@@ -139,7 +139,8 @@ function resetOptions() {
 function addProduct(id, name, image, price, discountPrice, productSelect, amount = 1, offerID = null, offerProductId = null) {
     const selectedProduct = productSelect.find(":selected");
     const productContainer = getProductContainer();
-    const productCounter = getNumberOfProducts(productContainer);
+    // const productCounter = getNumberOfProducts(productContainer);
+    const productCounter = Date.now();
 
     const template = document.querySelector('#product-template');
     let contentToBeInserted = template.content.cloneNode(true);

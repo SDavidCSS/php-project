@@ -2,6 +2,7 @@
 
 require_once 'Record.php';
 require_once 'Database.php';
+require_once 'OfferProduct.php';
 class Offer extends Record {
     public int $id = 0;
     public string $customer_name = '';
@@ -19,21 +20,11 @@ class Offer extends Record {
         return 'offer';
     }
 
-    public static function findAll()
+    public function load(array $config)
     {
-        $sql = 'SELECT * FROM `offer`';
-        $stmt = Database::getInstance()->query($sql);
-        $results = $stmt->fetchAll();
+        parent::load($config);
 
-        $offers = [];
-        foreach ($results as $result) {
-            $offer = new self;
-            $offer->load($result);
-            $offer->hasMany();
-            $offers[] = $offer;
-        }
-
-        return $offers;
+        if(!$this->isNewRecord) $this->getOfferProducts();
     }
 
     public function attributes(): array
@@ -48,19 +39,19 @@ class Offer extends Record {
 
     }
 
-    public function hasMany()
+    public function getOfferProducts()
     {
-        $sql = 'SELECT * FROM `offer_products` LEFT JOIN `product` ON `product`.id = `offer_products`.product_id WHERE offer_id = :offer_id ;';
+        $sql = 'SELECT * FROM `offer_products` WHERE offer_id = :offer_id ;';
         $stmt = Database::getInstance()->prepare($sql);
         $stmt->execute([':offer_id' => $this->id]);
-        $this->offerProducts = $stmt->fetchAll();
-    }
+        $result = $stmt->fetchAll();
 
-    public function delete()
-    {
-        $sql = 'DELETE FROM `offer` WHERE id = :id';
-        $stmt = Database::getInstance()->prepare($sql);
-        $stmt->execute([':id' => $this->id]);
+        foreach ($result as $op) {
+            $offerProduct = new OfferProduct();
+            $offerProduct->load($op);
+
+            $this->offerProducts[] = $offerProduct;
+        }
     }
 
     public static function getOfferInfo($id)
@@ -88,5 +79,4 @@ class Offer extends Record {
 
         return $data;
     }
-
 }
