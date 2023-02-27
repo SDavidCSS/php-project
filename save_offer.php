@@ -65,13 +65,6 @@ if(isset($_POST['Offer'])) {
             $ids = array_column($products, 'id');
             $difference = array_diff($result, $ids);
 
-//            echo '<pre>';
-//            var_dump($ids);
-//            var_dump($result);
-//            var_dump($difference);
-//            echo '</pre>';
-//            exit;
-
             if(!empty($difference)) {
                 foreach ($difference as $diff) {
                     $stmt = $db->prepare('DELETE FROM `offer_products` WHERE id=:id');

@@ -1,11 +1,7 @@
 <?php
-    include_once './classes/Database.php';
+    include_once './classes/Product.php';
 
-    $db = Database::getInstance();
-
-    $stmt = $db->query('SELECT * FROM product');
-    $stmt->execute();
-    $products = $stmt->fetchAll();
+    $products = Product::findAll();
 ?>
 
 <form method="POST" action="save_offer.php" id="offer-form">
@@ -40,8 +36,9 @@
             <div class="mb-3">
                 <label for="offer_product" class="form-label">Product</label>
                 <select class="form-control form-select" id="offer_product" name="offer_product">
-                    <?php foreach ($products as $product): ?>
-                        <option value="<?= $product['id'] ?>" data-name="<?= $product['name'] ?>" data-price="<?= $product['price'] ?>" data-img="<?= $product['image'] ?>"><?= $product['name'] ?></option>
+                    <?php /** @var Product $product */
+                    foreach ($products as $product): ?>
+                        <option value="<?= $product->id ?>" data-name="<?= $product->name ?>" data-price="<?= $product->price ?>" data-img="<?= $product->image ?>"><?= $product->name ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
